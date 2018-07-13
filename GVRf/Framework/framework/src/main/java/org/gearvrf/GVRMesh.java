@@ -895,6 +895,13 @@ public class GVRMesh extends GVRHybridObject implements PrettyPrint {
         mAnimationVertices.add(animBuff);
     }
 
+
+    /**
+     *
+     * @return List of {@link GVRVertexBuffer} containing the blend shapes associated with
+     * this GVRMesh.
+     */
+
     public List<GVRVertexBuffer> getAnimationMeshInfo()
     {
         return mAnimationVertices;
