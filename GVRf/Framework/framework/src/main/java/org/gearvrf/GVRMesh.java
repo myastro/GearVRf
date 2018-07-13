@@ -70,6 +70,7 @@ public class GVRMesh extends GVRHybridObject implements PrettyPrint {
     protected GVRVertexBuffer mVertices;
     protected GVRIndexBuffer mIndices;
     protected List<GVRBone> mBones = new ArrayList<GVRBone>();
+    private List<GVRVertexBuffer> mAnimationVertices = new ArrayList<GVRVertexBuffer>();
 
     /**
      * Construct a mesh with default vertex layout
@@ -528,7 +529,7 @@ public class GVRMesh extends GVRHybridObject implements PrettyPrint {
                 setIndexBuffer(new GVRIndexBuffer(getGVRContext(), 2, indices.capacity() / 2));
             }
             mIndices.setShortVec(indices);
-         }
+        }
         else
         {
             NativeMesh.setIndexBuffer(getNative(), 0L);
@@ -638,7 +639,7 @@ public class GVRMesh extends GVRHybridObject implements PrettyPrint {
      * @return true if attribute exists, false if not
      */
     public boolean hasAttribute(String key) {
-    	return mVertices.hasAttribute(key);
+        return mVertices.hasAttribute(key);
     }
 
     /**
@@ -651,7 +652,7 @@ public class GVRMesh extends GVRHybridObject implements PrettyPrint {
      * {@linkplain GVRContext#createQuad(float, float) quad} is cheap enough,
      * but with complex meshes you will probably want to cut search time by
      * registering the object's bounding box, not the whole mesh.
-     * 
+     *
      * @return A {@link GVRMesh} of the bounding box.
      */
     public GVRMesh getBoundingBox()
@@ -884,6 +885,19 @@ public class GVRMesh extends GVRHybridObject implements PrettyPrint {
         mesh.setTexCoords(texCoords);
         mesh.setIndices(triangles);
         return mesh;
+    }
+
+    /*
+        add vertex information of blend shapes
+     */
+    void addAnimationMesh(GVRVertexBuffer animBuff)
+    {
+        mAnimationVertices.add(animBuff);
+    }
+
+    public List<GVRVertexBuffer> getAnimationMeshInfo()
+    {
+        return mAnimationVertices;
     }
 
     @Override

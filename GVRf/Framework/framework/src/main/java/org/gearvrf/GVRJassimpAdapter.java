@@ -24,6 +24,7 @@ import org.gearvrf.animation.keyframe.GVRAnimationBehavior;
 import org.gearvrf.animation.keyframe.GVRAnimationChannel;
 import org.gearvrf.animation.keyframe.GVRKeyFrameAnimation;
 import org.gearvrf.jassimp.AiAnimBehavior;
+import org.gearvrf.jassimp.AiAnimMesh;
 import org.gearvrf.jassimp.AiAnimation;
 import org.gearvrf.jassimp.AiBone;
 import org.gearvrf.jassimp.AiBoneWeight;
@@ -233,6 +234,45 @@ class   GVRJassimpAdapter {
         {
             processBones(mesh, aiMesh.getBones());
         }
+
+        //animation mesh vertex information
+        for(AiAnimMesh animMesh : aiMesh.getAnimationMeshes())
+        {
+            GVRVertexBuffer animBuff = new GVRVertexBuffer(mesh.getVertexBuffer(),
+                    "float3 a_position float3 a_tangent float3 a_normal");
+
+            float[] vertexArray = null;
+            float[] normalArray = null;
+            float[] tangentArray = null;
+
+            //copy target positions to anim vertex buffer
+            FloatBuffer animPositionBuffer = animMesh.getPositionBuffer();
+            if (animPositionBuffer != null) {
+                vertexArray = new float[animPositionBuffer.capacity()];
+                animPositionBuffer.get(vertexArray, 0, animPositionBuffer.capacity());
+            }
+            animBuff.setFloatArray("a_position",vertexArray);
+
+            //copy target normals to anim normal buffer
+            FloatBuffer animNormalBuffer = animMesh.getNormalBuffer();
+            if (animNormalBuffer != null) {
+                normalArray = new float[animNormalBuffer.capacity()];
+                animNormalBuffer.get(normalArray, 0, animNormalBuffer.capacity());
+            }
+            animBuff.setFloatArray("a_normal",normalArray);
+
+
+            //copy target tangents to anim tangent buffer
+            FloatBuffer animTangentBuffer = animMesh.getTangentBuffer();
+            if (animTangentBuffer != null) {
+                tangentArray = new float[animTangentBuffer.capacity()];
+                animTangentBuffer.get(tangentArray, 0, animTangentBuffer.capacity());
+            }
+            animBuff.setFloatArray("a_tangent",tangentArray);
+
+            mesh.addAnimationMesh(animBuff);
+        }
+
         return mesh;
     }
 
@@ -452,18 +492,18 @@ class   GVRJassimpAdapter {
 
     private GVRAnimationBehavior convertAnimationBehavior(AiAnimBehavior behavior) {
         switch (behavior) {
-        case DEFAULT:
-            return GVRAnimationBehavior.DEFAULT;
-        case CONSTANT:
-            return GVRAnimationBehavior.CONSTANT;
-        case LINEAR:
-            return GVRAnimationBehavior.LINEAR;
-        case REPEAT:
-            return GVRAnimationBehavior.REPEAT;
-        default:
-            // Unsupported setting
-            Log.e(TAG, "Cannot convert animation behavior: %s", behavior);
-            return GVRAnimationBehavior.DEFAULT;
+            case DEFAULT:
+                return GVRAnimationBehavior.DEFAULT;
+            case CONSTANT:
+                return GVRAnimationBehavior.CONSTANT;
+            case LINEAR:
+                return GVRAnimationBehavior.LINEAR;
+            case REPEAT:
+                return GVRAnimationBehavior.REPEAT;
+            default:
+                // Unsupported setting
+                Log.e(TAG, "Cannot convert animation behavior: %s", behavior);
+                return GVRAnimationBehavior.DEFAULT;
         }
     }
 
@@ -640,7 +680,7 @@ class   GVRJassimpAdapter {
                         "onLoaded");
             }
         });
-     }
+    }
 
     private void attachLights(Hashtable<String, GVRLight> lightlist, GVRSceneObject sceneObject){
         String name = sceneObject.getName();
@@ -701,9 +741,9 @@ class   GVRJassimpAdapter {
                 opacity *= material.getOpacity();
             }
             meshMaterial.setVec3("u_color",
-                                 diffuseColor.getRed(),
-                                 diffuseColor.getGreen(),
-                                 diffuseColor.getBlue());
+                    diffuseColor.getRed(),
+                    diffuseColor.getGreen(),
+                    diffuseColor.getBlue());
             meshMaterial.setFloat("u_opacity", opacity);
         }
         else
@@ -717,27 +757,27 @@ class   GVRJassimpAdapter {
                     diffuseColor.getGreen(), diffuseColor.getBlue(), opacity);
 
             /* Specular color */
-                AiColor specularColor = material.getSpecularColor(sWrapperProvider);
-                meshMaterial.setSpecularColor(specularColor.getRed(),
-                                              specularColor.getGreen(), specularColor.getBlue(),
-                                              specularColor.getAlpha());
+            AiColor specularColor = material.getSpecularColor(sWrapperProvider);
+            meshMaterial.setSpecularColor(specularColor.getRed(),
+                    specularColor.getGreen(), specularColor.getBlue(),
+                    specularColor.getAlpha());
 
 
             /* Ambient color */
-                AiColor ambientColor = material.getAmbientColor(sWrapperProvider);
-                if (meshMaterial.hasUniform("ambient_color"))
-                {
-                    meshMaterial.setAmbientColor(ambientColor.getRed(),
-                                                 ambientColor.getGreen(), ambientColor.getBlue(),
-                                                 ambientColor.getAlpha());
-                }
+            AiColor ambientColor = material.getAmbientColor(sWrapperProvider);
+            if (meshMaterial.hasUniform("ambient_color"))
+            {
+                meshMaterial.setAmbientColor(ambientColor.getRed(),
+                        ambientColor.getGreen(), ambientColor.getBlue(),
+                        ambientColor.getAlpha());
+            }
 
 
             /* Emissive color */
-                AiColor emissiveColor = material.getEmissiveColor(sWrapperProvider);
-                meshMaterial.setVec4("emissive_color", emissiveColor.getRed(),
-                                     emissiveColor.getGreen(), emissiveColor.getBlue(),
-                                     emissiveColor.getAlpha());
+            AiColor emissiveColor = material.getEmissiveColor(sWrapperProvider);
+            meshMaterial.setVec4("emissive_color", emissiveColor.getRed(),
+                    emissiveColor.getGreen(), emissiveColor.getBlue(),
+                    emissiveColor.getAlpha());
         }
 
         /* Specular Exponent */
