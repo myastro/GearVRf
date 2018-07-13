@@ -70,16 +70,16 @@ import java.util.Set;
  *
  * <h3>API for vertex and face data</h3>
  * The jassimp interface for accessing vertex and face data is not a one-to-one
- * mapping of the c/c++ interface. The c/c++ interface uses an object-oriented 
- * approach to represent data, which provides a considerable 
- * overhead using a naive java based realization (cache locality would be 
+ * mapping of the c/c++ interface. The c/c++ interface uses an object-oriented
+ * approach to represent data, which provides a considerable
+ * overhead using a naive java based realization (cache locality would be
  * unpredictable and most likely bad, bulk data transfer would be impossible).
  * <p>
  *
  * The jassimp interface uses flat byte buffers to store vertex and face data.
  * This data can be accessed through three APIs:
  * <ul>
- *   <li><b>Buffer API:</b> the <code>getXXXBuffer()</code> methods return 
+ *   <li><b>Buffer API:</b> the <code>getXXXBuffer()</code> methods return
  *     raw data buffers.
  *   <li><b>Direct API:</b> the <code>getXXX()</code> methods allow reading
  *     and writing of individual data values.
@@ -93,7 +93,7 @@ import java.util.Set;
  * methods, e.g., to fill VBOs with data. Each invocation of a
  * <code>getXXXBuffer()</code> method will return a new view of the internal
  * buffer, i.e., if is safe to use the relative byte buffer operations.
- * The Buffer API provides the best performance of all three APIs, especially 
+ * The Buffer API provides the best performance of all three APIs, especially
  * if large data volumes have to be processed.<p>
  *
  * The Direct API provides an easy to use interface for reading and writing
@@ -105,7 +105,7 @@ import java.util.Set;
  * <p>
  *
  * The Wrapped API offers an object oriented interface for accessing
- * and modifying mesh data. As the name implies, this interface is realized 
+ * and modifying mesh data. As the name implies, this interface is realized
  * through wrapper objects that provide a view on the raw data. For each
  * invocation of a <code>getWrappedXXX()</code> method, a new wrapper object
  * is created. Iterating over mesh data via this interface will create many
@@ -118,14 +118,14 @@ import java.util.Set;
  *
  * <h3>API for bones</h3>
  * As there is no standardized way for doing skinning in different graphics
- * engines, bones are not represented as flat buffers but as object structure. 
- * Users of this library should convert this structure to the format required 
- * by the specific graphics engine. 
+ * engines, bones are not represented as flat buffers but as object structure.
+ * Users of this library should convert this structure to the format required
+ * by the specific graphics engine.
  *
  *
  * <h3>Changing Data</h3>
- * This class is designed to be mutable, i.e., the returned objects and buffers 
- * may be modified. It is not possible to add/remove vertices as this would 
+ * This class is designed to be mutable, i.e., the returned objects and buffers
+ * may be modified. It is not possible to add/remove vertices as this would
  * require reallocation of the data buffers. Wrapped objects may or may not
  * propagate changes to the underlying data buffers. Consult the documentation
  * of your wrapper provider for details. The built in wrappers will propagate
