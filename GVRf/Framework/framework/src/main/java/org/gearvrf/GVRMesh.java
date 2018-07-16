@@ -71,6 +71,7 @@ public class GVRMesh extends GVRHybridObject implements PrettyPrint {
     protected GVRIndexBuffer mIndices;
     protected List<GVRBone> mBones = new ArrayList<GVRBone>();
     private List<GVRVertexBuffer> mAnimationVertices = new ArrayList<GVRVertexBuffer>();
+    private List<Float> mAnimationWeights = new ArrayList<Float>();
 
     /**
      * Construct a mesh with default vertex layout
@@ -896,6 +897,14 @@ public class GVRMesh extends GVRHybridObject implements PrettyPrint {
     }
 
 
+    /*
+        add weight of a animation mesh
+     */
+    void addAnimationWeight(float weight){
+        mAnimationWeights.add(weight);
+    }
+
+
     /**
      *
      * @return List of {@link GVRVertexBuffer} containing the blend shapes associated with
@@ -905,6 +914,15 @@ public class GVRMesh extends GVRHybridObject implements PrettyPrint {
     public List<GVRVertexBuffer> getAnimationMeshInfo()
     {
         return mAnimationVertices;
+    }
+
+    /**
+     *
+     * @return List of floats representing default weights of animation meshes held by this GVRMesh.
+     */
+
+    public List<Float> getAnimationWeights() {
+        return mAnimationWeights;
     }
 
     @Override

@@ -271,6 +271,7 @@ class   GVRJassimpAdapter {
             animBuff.setFloatArray("a_tangent",tangentArray);
 
             mesh.addAnimationMesh(animBuff);
+            mesh.addAnimationWeight(animMesh.getDefaultWeight());
         }
 
         return mesh;

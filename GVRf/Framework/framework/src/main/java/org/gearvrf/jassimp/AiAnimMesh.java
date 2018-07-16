@@ -59,12 +59,30 @@ public class AiAnimMesh {
         return m_normals.asFloatBuffer();
     }
 
+    /**
+     * Returns a buffer containing tangents.<p>
+     *
+     * A tangent consists of a triple of floats, the buffer will
+     * therefore contain <code>3 * getNumVertices()</code> floats
+     *
+     * @return a native-order direct buffer
+     */
+
     public FloatBuffer getTangentBuffer() {
         if (m_tangents == null) {
             return null;
         }
 
         return m_tangents.asFloatBuffer();
+    }
+
+    /**
+     *
+     * @return the default weight of the animation mesh
+     */
+
+    public float getDefaultWeight() {
+        return m_weight;
     }
 
 
@@ -169,11 +187,5 @@ public class AiAnimMesh {
      */
     private ByteBuffer[] m_texcoords =
             new ByteBuffer[JassimpConfig.MAX_NUMBER_TEXCOORDS];
-
-
-
-
-
-
 
 }
