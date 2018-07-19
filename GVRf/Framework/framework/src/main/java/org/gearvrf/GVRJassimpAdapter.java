@@ -280,7 +280,7 @@ class   GVRJassimpAdapter {
                 Vector3f tangent = new Vector3f(tangentArray[i], tangentArray[i + 1], tangentArray[i + 2]);
                 Vector3f normal = new Vector3f(normalArray[i], normalArray[i + 1], normalArray[i + 2]);
                 Vector3f bitangent = new Vector3f();
-                tangent.cross(normal, bitangent);
+                normal.cross(tangent, bitangent);
                 bitangentArray[i] = bitangent.x; bitangentArray[i+1] = bitangent.y; bitangentArray[i + 2] = bitangent.z;
             }
 
