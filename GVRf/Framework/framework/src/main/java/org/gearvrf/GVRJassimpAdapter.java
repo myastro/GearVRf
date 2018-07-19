@@ -49,6 +49,7 @@ import org.gearvrf.shaders.GVRPBRShader;
 import org.gearvrf.utility.Log;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import static java.lang.Integer.parseInt;
 
@@ -239,11 +240,12 @@ class   GVRJassimpAdapter {
         for(AiAnimMesh animMesh : aiMesh.getAnimationMeshes())
         {
             GVRVertexBuffer animBuff = new GVRVertexBuffer(mesh.getVertexBuffer(),
-                    "float3 a_position float3 a_tangent float3 a_normal");
+                    "float3 a_position float3 a_tangent float3 a_normal float3 a_bitangent");
 
             float[] vertexArray = null;
             float[] normalArray = null;
             float[] tangentArray = null;
+            float[] bitangentArray = null;
 
             //copy target positions to anim vertex buffer
             FloatBuffer animPositionBuffer = animMesh.getPositionBuffer();
@@ -269,6 +271,20 @@ class   GVRJassimpAdapter {
                 animTangentBuffer.get(tangentArray, 0, animTangentBuffer.capacity());
             }
             animBuff.setFloatArray("a_tangent",tangentArray);
+
+            //calculate bitangents
+
+            bitangentArray = new float[tangentArray.length];
+            for(int i = 0; i < tangentArray.length; i += 3)
+            {
+                Vector3f tangent = new Vector3f(tangentArray[i], tangentArray[i + 1], tangentArray[i + 2]);
+                Vector3f normal = new Vector3f(normalArray[i], normalArray[i + 1], normalArray[i + 2]);
+                Vector3f bitangent = new Vector3f();
+                tangent.cross(normal, bitangent);
+                bitangentArray[i] = bitangent.x; bitangentArray[i+1] = bitangent.y; bitangentArray[i + 2] = bitangent.z;
+            }
+
+            animBuff.setFloatArray("a_bitangent", bitangentArray);
 
             mesh.addAnimationMesh(animBuff);
             mesh.addAnimationWeight(animMesh.getDefaultWeight());
