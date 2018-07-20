@@ -201,6 +201,11 @@ public class GVRMeshMorph extends GVRBehavior
         return ((GVRRenderData) comp).getMaterial();
     }
 
+    public int getBlendShapeCount()
+    {
+        return mNumBlendShapes;
+    }
+
     public boolean update()
     {
         GVRTexture blendshapeTex;
