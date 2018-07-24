@@ -800,7 +800,6 @@ class   GVRJassimpAdapter {
         /* Specular Exponent */
         float specularExponent = material.getShininess();
         meshMaterial.setSpecularExponent(specularExponent);
-
         sceneObjectRenderData.setMaterial(meshMaterial);
         sceneObject.attachRenderData(sceneObjectRenderData);
         setMeshMorphComponent(mesh, sceneObject, aiMesh);
