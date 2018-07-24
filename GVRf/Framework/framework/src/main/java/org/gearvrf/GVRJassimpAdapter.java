@@ -233,10 +233,6 @@ class   GVRJassimpAdapter {
         {
             processBones(mesh, aiMesh.getBones());
         }
-<<<<<<< HEAD
-        return mesh;
-=======
-
         return mesh;
     }
 
@@ -305,7 +301,6 @@ class   GVRJassimpAdapter {
         }
 
         morph.update();
->>>>>>> d4bca3ad... attach mesh component when importing objects
     }
 
     public void processBones(GVRMesh mesh, List<AiBone> aiBones)

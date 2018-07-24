@@ -886,10 +886,6 @@ public class GVRMesh extends GVRHybridObject implements PrettyPrint {
         return mesh;
     }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> d4bca3ad... attach mesh component when importing objects
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
