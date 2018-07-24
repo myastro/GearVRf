@@ -59,7 +59,6 @@ public class GVRPBRShader extends GVRShaderTemplate
             normalShader = TextFile.readTextFile(context, R.raw.normalmap);
             morphShader = TextFile.readTextFile(context, R.raw.vertexmorph);
             skinShader = TextFile.readTextFile(context, R.raw.vertexskinning);
-            morphShader = TextFile.readTextFile(context, R.raw.vertexmorph);
             addLight = TextFile.readTextFile(context, R.raw.pbr_addlight);
         }
         String defines = "#define ambient_coord metallicRoughness_coord\n";

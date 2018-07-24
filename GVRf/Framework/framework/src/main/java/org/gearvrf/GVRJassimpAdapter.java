@@ -236,60 +236,6 @@ class   GVRJassimpAdapter {
             processBones(mesh, aiMesh.getBones());
         }
 
-        //animation mesh vertex information
-        for(AiAnimMesh animMesh : aiMesh.getAnimationMeshes())
-        {
-            GVRVertexBuffer animBuff = new GVRVertexBuffer(mesh.getVertexBuffer(),
-                    "float3 a_position float3 a_tangent float3 a_normal float3 a_bitangent");
-
-            float[] vertexArray = null;
-            float[] normalArray = null;
-            float[] tangentArray = null;
-            float[] bitangentArray = null;
-
-            //copy target positions to anim vertex buffer
-            FloatBuffer animPositionBuffer = animMesh.getPositionBuffer();
-            if (animPositionBuffer != null) {
-                vertexArray = new float[animPositionBuffer.capacity()];
-                animPositionBuffer.get(vertexArray, 0, animPositionBuffer.capacity());
-            }
-            animBuff.setFloatArray("a_position",vertexArray);
-
-            //copy target normals to anim normal buffer
-            FloatBuffer animNormalBuffer = animMesh.getNormalBuffer();
-            if (animNormalBuffer != null) {
-                normalArray = new float[animNormalBuffer.capacity()];
-                animNormalBuffer.get(normalArray, 0, animNormalBuffer.capacity());
-            }
-            animBuff.setFloatArray("a_normal",normalArray);
-
-
-            //copy target tangents to anim tangent buffer
-            FloatBuffer animTangentBuffer = animMesh.getTangentBuffer();
-            if (animTangentBuffer != null) {
-                tangentArray = new float[animTangentBuffer.capacity()];
-                animTangentBuffer.get(tangentArray, 0, animTangentBuffer.capacity());
-            }
-            animBuff.setFloatArray("a_tangent",tangentArray);
-
-            //calculate bitangents
-
-            bitangentArray = new float[tangentArray.length];
-            for(int i = 0; i < tangentArray.length; i += 3)
-            {
-                Vector3f tangent = new Vector3f(tangentArray[i], tangentArray[i + 1], tangentArray[i + 2]);
-                Vector3f normal = new Vector3f(normalArray[i], normalArray[i + 1], normalArray[i + 2]);
-                Vector3f bitangent = new Vector3f();
-                normal.cross(tangent, bitangent);
-                bitangentArray[i] = bitangent.x; bitangentArray[i+1] = bitangent.y; bitangentArray[i + 2] = bitangent.z;
-            }
-
-            animBuff.setFloatArray("a_bitangent", bitangentArray);
-
-            mesh.addAnimationMesh(animBuff);
-            mesh.addAnimationWeight(animMesh.getDefaultWeight());
-        }
-
         return mesh;
     }
 
