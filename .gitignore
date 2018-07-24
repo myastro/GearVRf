@@ -14,6 +14,7 @@ gearvrf-libs/
 // Ignored Extensions  /
 ////////////////////////
 *.prefs
+*.so
 
 /////////////////////////
 // Ignored Files        /
