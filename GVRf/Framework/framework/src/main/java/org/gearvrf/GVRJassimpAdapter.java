@@ -120,14 +120,26 @@ class   GVRJassimpAdapter {
         // Normals
         if (doLighting)
         {
+
             FloatBuffer normalsBuffer = aiMesh.getNormalBuffer();
             if (normalsBuffer != null)
             {
                 vertexDescriptor += " float3 a_normal";
+
                 normalsArray = new float[normalsBuffer.capacity()];
                 normalsBuffer.get(normalsArray, 0, normalsBuffer.capacity());
             }
+
         }
+
+
+
+
+
+
+
+
+
         for(int c = 0; c < MAX_VERTEX_COLORS; c++)
         {
             FloatBuffer fbuf = aiMesh.getColorBuffer(c);
@@ -149,13 +161,22 @@ class   GVRJassimpAdapter {
         }
         if (doLighting && aiMesh.hasTangentsAndBitangents())
         {
+
             vertexDescriptor += " float3 a_tangent float3 a_bitangent";
+
             FloatBuffer tangentBuffer = aiMesh.getTangentBuffer();
-            FloatBuffer bitangentBuffer = aiMesh.getBitangentBuffer();
+
             tangentsArray = new float[tangentBuffer.capacity()];
             tangentBuffer.get(tangentsArray, 0, tangentBuffer.capacity());
-            bitangentsArray = new float[bitangentBuffer.capacity()];
-            bitangentBuffer.get(bitangentsArray, 0, bitangentBuffer.capacity());
+            bitangentsArray = new float[tangentsArray.length];
+            for(int i = 0; i < tangentsArray.length; i += 3)
+            {
+                Vector3f tangent = new Vector3f(tangentsArray[i], tangentsArray[i + 1], tangentsArray[i + 2]);
+                Vector3f normal = new Vector3f(normalsArray[i], normalsArray[i + 1], normalsArray[i + 2]);
+                Vector3f bitangent = new Vector3f();
+                normal.cross(tangent, bitangent);
+                bitangentsArray[i] = bitangent.x; bitangentsArray[i+1] = bitangent.y; bitangentsArray[i + 2] = bitangent.z;
+            }
         }
 
         GVRMesh mesh = new GVRMesh(ctx, vertexDescriptor);
@@ -196,7 +217,9 @@ class   GVRJassimpAdapter {
         }
         if (tangentsArray != null)
         {
+
             mesh.setFloatArray("a_tangent", tangentsArray);
+
         }
         if (bitangentsArray != null)
         {
@@ -235,7 +258,6 @@ class   GVRJassimpAdapter {
         {
             processBones(mesh, aiMesh.getBones());
         }
-
         return mesh;
     }
 
@@ -246,7 +268,7 @@ class   GVRJassimpAdapter {
         if(nAnimationMeshes == 0)
             return;
 
-        GVRMeshMorph morph = new GVRMeshMorph(mContext, nAnimationMeshes, false);
+        GVRMeshMorph morph = new GVRMeshMorph(mContext, nAnimationMeshes);
         sceneObject.attachComponent(morph);
         int blendShapeNum = 0;
 
@@ -433,21 +455,23 @@ class   GVRJassimpAdapter {
 
         // Pos keys
         int i;
+        Quaternionf q = new Quaternionf();
         for (i = 0; i < aiNodeAnim.getNumPosKeys(); ++i) {
             float[] pos = aiNodeAnim.getPosKeyVector(i, sWrapperProvider);
-            node.setPosKeyVector(i, (float)aiNodeAnim.getPosKeyTime(i), pos[0], pos[1], pos[2]);
+            node.setPosKeyVector(i, (float)aiNodeAnim.getPosKeyTime(i), pos);
         }
 
         // Rot keys
         for (i = 0; i < aiNodeAnim.getNumRotKeys(); ++i) {
-            Quaternionf rot = aiNodeAnim.getRotKeyQuaternion(i, sWrapperProvider);
+            q = aiNodeAnim.getRotKeyQuaternion(i, sWrapperProvider);
+            float[] rot = new float[] { q.x, q.y, q.z, q.w };
             node.setRotKeyQuaternion(i, (float)aiNodeAnim.getRotKeyTime(i), rot);
         }
 
         // Scale keys
         for (i = 0; i < aiNodeAnim.getNumScaleKeys(); ++i) {
             float[] scale = aiNodeAnim.getScaleKeyVector(i, sWrapperProvider);
-            node.setScaleKeyVector(i, (float)aiNodeAnim.getScaleKeyTime(i), scale[0], scale[1], scale[2]);
+            node.setScaleKeyVector(i, (float)aiNodeAnim.getScaleKeyTime(i), scale);
         }
 
         return node;
@@ -671,7 +695,7 @@ class   GVRJassimpAdapter {
      * @param aiMesh
      *            The assimp mesh
      **
-     * @return The new {@link GVRSceneObject} with the input mesh for the node {@link node}
+     * @return The new {@link GVRSceneObject} with the input mesh for the node {@linknode}
      *
      * @throws IOException
      *             File does not exist or cannot be read

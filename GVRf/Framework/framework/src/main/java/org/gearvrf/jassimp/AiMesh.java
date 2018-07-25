@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.gearvrf.jassimp;
 
+import org.gearvrf.utility.Log;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -550,9 +552,10 @@ public final class AiMesh {
      */
     public FloatBuffer getTangentBuffer() {
         if (m_tangents == null) {
+
             return null;
         }
-        
+
         return m_tangents.asFloatBuffer();
     }
     
@@ -1185,8 +1188,6 @@ public final class AiMesh {
         return m_animMeshes;
     }
 
-    
-    
     // {{ Helpers
     /**
      * Throws an exception if the vertex index is not in the allowed range.

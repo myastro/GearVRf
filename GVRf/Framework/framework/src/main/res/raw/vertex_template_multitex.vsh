@@ -88,6 +88,8 @@ struct Vertex
 	vec4 local_normal;
 	vec3 viewspace_position;
 	vec3 viewspace_normal;
+	vec3 local_tangent;
+	vec3 local_bitangent;
 	vec3 view_direction;
 };
 
@@ -103,11 +105,13 @@ void main() {
 	Vertex vertex;
 
 	vertex.local_position = vec4(a_position.xyz, 1.0);
-
 #ifdef HAS_a_normal
     vertex.local_normal = vec4(normalize(a_normal), 0.0);
 #endif
-
+#ifdef HAS_a_tangent
+    vertex.local_tangent = a_tangent;
+    vertex.local_bitangent = a_bitangent;
+#endif
 #ifdef HAS_VertexMorphShader
 @VertexMorphShader
 #endif

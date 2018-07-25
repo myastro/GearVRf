@@ -70,6 +70,7 @@ public class GVRMesh extends GVRHybridObject implements PrettyPrint {
     protected GVRVertexBuffer mVertices;
     protected GVRIndexBuffer mIndices;
     protected List<GVRBone> mBones = new ArrayList<GVRBone>();
+
     /**
      * Construct a mesh with default vertex layout
      * <i>float3 a_position float2 a_texcoord float3 a_normal</i>
@@ -895,6 +896,7 @@ public class GVRMesh extends GVRHybridObject implements PrettyPrint {
     final static String KEY_TEXCOORD = "a_texcoord";
     final static String KEY_NORMAL = "a_normal";
     final static String KEY_POSITION = "a_position";
+
 }
 
 class NativeMesh {

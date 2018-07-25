@@ -1029,6 +1029,7 @@ static bool loadMeshes(JNIEnv *env, const aiScene* cScene, jobject& jScene)
 					return false;
 				}
 			}
+
 		}
 
 
