@@ -37,7 +37,7 @@ public final class GVRAnimationChannel implements PrettyPrint {
 
         m_nodeName = nodeName;
         mPosInterpolator = new GVRFloatAnimation(numPosKeys, 4);
-        mRotInterpolator = new GVRFloatAnimation(numRotKeys, 5);
+        mRotInterpolator = new GVRQuatAnimation(numRotKeys);
         mSclInterpolator = new GVRFloatAnimation(numScaleKeys, 4);
         mPreState = preBehavior;
         mPostState = postBehavior;
@@ -55,6 +55,18 @@ public final class GVRAnimationChannel implements PrettyPrint {
         return m_nodeName;
     }
 
+
+    /**
+     * Resize the position keys.
+     * This function will truncate the position keys if the
+     * initial setting was too large.
+     * 
+     * @oaran numPosKeys the desired size for the position keys
+     */
+    public void resizePosKeys(int numPosKeys)
+    {
+        mPosInterpolator.resizeKeys(numPosKeys);
+    }
 
     /**
      * Returns the number of position keys.
@@ -87,14 +99,15 @@ public final class GVRAnimationChannel implements PrettyPrint {
         mPosInterpolator.getKey(keyIndex, pos);
     }
 
-
-
     public void setPosKeyVector(int keyIndex, float time, final float[] pos)
     {
         mPosInterpolator.setKey(keyIndex, time, pos);
-
     }
 
+    public void setPosKeyVector(int keyIndex, float time, float x, float y, float z)
+    {
+        mPosInterpolator.setKey(keyIndex, time, new float[] { x, y, z });
+    }
 
     /**
      * Returns the number of rotation keys.
@@ -105,6 +118,17 @@ public final class GVRAnimationChannel implements PrettyPrint {
         return mRotInterpolator.getNumKeys();
     }
 
+    /**
+     * Resize the rotation keys.
+     * This function will truncate the rotation keys if the
+     * initial setting was too large.
+     *
+     * @oaran numRotKeys the desired size for the rotation keys
+     */
+    public void resizeRotKeys(int numRotKeys)
+    {
+        mRotInterpolator.resizeKeys(numRotKeys);
+    }
 
     /**
      * Returns the time component of the specified rotation key.
@@ -133,8 +157,11 @@ public final class GVRAnimationChannel implements PrettyPrint {
     public void setRotKeyQuaternion(int keyIndex, float time, float[] rot)
     {
         mRotInterpolator.setKey(keyIndex, time, rot);
+    }
 
-
+    public void setRotKeyQuaternion(int keyIndex, float time, Quaternionf rot)
+    {
+        mRotInterpolator.setKey(keyIndex, time, rot);
     }
 
     /**
@@ -146,6 +173,17 @@ public final class GVRAnimationChannel implements PrettyPrint {
         return mSclInterpolator.getNumKeys();
     }
 
+    /**
+     * Resize the scale keys.
+     * This function will truncate the scale keys if the
+     * initial setting was too large.
+     *
+     * @oaran numScaleKeys the desired size for the position keys
+     */
+    public void resizeScaleKeys(int numScaleKeys)
+    {
+        mSclInterpolator.resizeKeys(numScaleKeys);
+    }
 
     /**
      * Returns the time component of the specified scaling key.
@@ -156,7 +194,6 @@ public final class GVRAnimationChannel implements PrettyPrint {
     public double getScaleKeyTime(int keyIndex) {
         return mRotInterpolator.getTime(keyIndex);
     }
-
 
     /**
      * Returns the scaling factor as vector.<p>
@@ -209,20 +246,10 @@ public final class GVRAnimationChannel implements PrettyPrint {
      */
     public void animate(float animationTime, Matrix4f mat)
     {
-
-        mPosInterpolator.setInterpolationType("LERP");
-        mSclInterpolator.setInterpolationType("LERP");
-        mRotInterpolator.setInterpolationType("SLERP");
-
         mRotInterpolator.animate(animationTime, mRotKey);
         mPosInterpolator.animate(animationTime, mPosKey);
         mSclInterpolator.animate(animationTime, mScaleKey);
-
-        mTempQuat.set(mRotKey[0], mRotKey[1], mRotKey[2], mRotKey[3]);
-        mat.set(mTempQuat);
-        mat.scale(mScaleKey[0], mScaleKey[1], mScaleKey[2]);
-        mat.setTranslation(mPosKey[0], mPosKey[1], mPosKey[2]);
-
+        mat.translationRotateScale(mPosKey[0], mPosKey[1], mPosKey[2], mRotKey[0], mRotKey[1], mRotKey[2], mRotKey[3], mScaleKey[0], mScaleKey[1], mScaleKey[2]);
     }
 
     @Override
@@ -253,7 +280,7 @@ public final class GVRAnimationChannel implements PrettyPrint {
     final private float[] mRotKey = new float[] { 0, 0, 0, 1 };
     final private Quaternionf mTempQuat = new Quaternionf(0, 0, 0, 1);
     final private GVRFloatAnimation mPosInterpolator;
-    final private GVRFloatAnimation mRotInterpolator;
+    final private GVRQuatAnimation mRotInterpolator;
     final private GVRFloatAnimation mSclInterpolator;
 
     /**

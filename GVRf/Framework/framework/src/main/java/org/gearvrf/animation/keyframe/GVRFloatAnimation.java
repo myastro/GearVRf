@@ -2,54 +2,44 @@ package org.gearvrf.animation.keyframe;
 
 import org.gearvrf.PrettyPrint;
 import org.gearvrf.utility.Log;
-import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 /**
  * Describes the animation of a set of floating point values.
  */
-public final class GVRFloatAnimation implements PrettyPrint
+public class GVRFloatAnimation implements PrettyPrint
 {
     private static final String TAG = GVRFloatAnimation.class.getSimpleName();
 
-
-    public static class FloatKeyInterpolator
+    public static class LinearInterpolator
     {
-        private final int mFloatsPerKey;
-        private final float[] mKeyData;
-        private int mLastKeyIndex;
+        protected final int mFloatsPerKey;
+        protected int mLastKeyIndex;
+        protected float[] mKeyData;
 
-
-
-        public FloatKeyInterpolator(float[] keyData, int keySize)
+        public LinearInterpolator(float[] keyData, int keySize)
         {
             mKeyData = keyData;
             mFloatsPerKey = keySize;
             mLastKeyIndex = -1;
-
-
         }
 
-        protected float[] interpolate(float time, float[] destValues, String interpltnType)
+        protected float[] interpolate(float time, float[] destValues)
         {
-
-
             int index = getKeyIndex(time);
             float curTime = getTime(index);
-
-
             float nextTime = getTime(index + 1);
 
             if ((index >= 0) &&
-                    (curTime <= time) &&
-                    (time < nextTime))
+                (curTime <= time) &&
+                (time < nextTime))
             {
                 // interpolate
                 float deltaTime = nextTime - curTime;
                 float factor = (time - curTime) / deltaTime;
 
-                interpolateValues(index, destValues, factor, interpltnType);
+                interpolateValues(index, destValues, factor);
             }
             else
             {
@@ -57,15 +47,20 @@ public final class GVRFloatAnimation implements PrettyPrint
                 if (time <= getTime(0))
                 {
                     getValues(0, destValues);
-
                 }
                 else
                 {
                     getValues(getNumKeys() - 1, destValues);
-
                 }
             }
             return destValues;
+        }
+
+        float[] getKeyData() { return mKeyData; }
+
+        void setKeyData(float[] keyData)
+        {
+            mKeyData = keyData;
         }
 
         public int getKeyOffset(int keyIndex)
@@ -119,7 +114,7 @@ public final class GVRFloatAnimation implements PrettyPrint
             return false;
         }
 
-        public boolean interpolateValues(int keyIndex, float[] values, float factor, String interpltnType)
+        public boolean interpolateValues(int keyIndex, float[] values, float factor)
         {
             int firstOfs = getKeyOffset(keyIndex);
             int lastOfs = getKeyOffset(keyIndex + 1);
@@ -130,47 +125,10 @@ public final class GVRFloatAnimation implements PrettyPrint
             }
             ++firstOfs;
             ++lastOfs;
-
-
-
-            if(interpltnType == "LERP") {
-
-                for (int i = 0; i < mFloatsPerKey - 1; ++i) {
-                    values[i] = factor * mKeyData[lastOfs + i] + (1.0f - factor) * mKeyData[firstOfs + i];
-
-
-                }
-
-            }
-
-            else if(interpltnType == "SLERP")
-
+            for (int i = 0; i < mFloatsPerKey - 1; ++i)
             {
-
-                Quaternionf rot = new Quaternionf();
-                rot.x = mKeyData[firstOfs + 0];
-                rot.y = mKeyData[firstOfs + 1];
-                rot.z = mKeyData[firstOfs + 2];
-                rot.w = mKeyData[firstOfs + 3];
-
-                Quaternionf rotTarget = new Quaternionf();
-                rotTarget.x = mKeyData[lastOfs + 0];
-                rotTarget.y = mKeyData[lastOfs + 1];
-                rotTarget.z = mKeyData[lastOfs + 2];
-                rotTarget.w = mKeyData[lastOfs + 3];
-
-                Quaternionf valuesQ = rot.slerp(rotTarget, factor);
-
-                values[0] = valuesQ.x;
-                values[1] = valuesQ.y;
-                values[2] = valuesQ.z;
-                values[3] = valuesQ.w;
-
-
-
+                values[i] = factor * mKeyData[lastOfs + i] + (1.0f - factor) * mKeyData[firstOfs + i];
             }
-
-
             return true;
         }
 
@@ -196,15 +154,15 @@ public final class GVRFloatAnimation implements PrettyPrint
             if ((mLastKeyIndex != -1) && (lastOfs >= 0))
             {
                 if ((lastTime <= time) &&
-                        (time < nextTime))
+                    (time < nextTime))
                 {
                     return mLastKeyIndex;
                 }
                 float prevTime = getTime(mLastKeyIndex - 1);
 
                 if ((prevTime >= 0) &&
-                        (prevTime <= time) &&
-                        (time < lastTime))
+                    (prevTime <= time) &&
+                    (time < lastTime))
                 {
                     return --mLastKeyIndex;
                 }
@@ -213,8 +171,8 @@ public final class GVRFloatAnimation implements PrettyPrint
 
                 // Try neighboring keys
                 if ((nextTime >= 0) &&
-                        (lastTime <= time) &&
-                        (time < nextTime))
+                    (lastTime <= time) &&
+                    (time < nextTime))
                 {
                     return ++mLastKeyIndex;
                 }
@@ -249,15 +207,15 @@ public final class GVRFloatAnimation implements PrettyPrint
                 }
             }
             if ((getTime(low) <= time) &&
-                    (time < getTime(low + 1)))
+                (time < getTime(low + 1)))
             {
                 return mLastKeyIndex = low;
             }
             float lowTime = getTime(low + 2);
 
             if ((lowTime >= 0) &&
-                    (getTime(low + 1) <= time) &&
-                    (time < lowTime))
+               (getTime(low + 1) <= time) &&
+               (time < lowTime))
             {
                 return mLastKeyIndex = low + 1;
             }
@@ -266,11 +224,9 @@ public final class GVRFloatAnimation implements PrettyPrint
         }
     };
 
-    final private int mFloatsPerKey;
-    final protected float[] mKeys;
-    final private FloatKeyInterpolator mFloatInterpolator;
-
-    private String interpolationType = " ";
+    final protected int mFloatsPerKey;
+    protected float[] mKeys;
+    protected LinearInterpolator mFloatInterpolator;
 
     /**
      * Constructor.
@@ -290,8 +246,7 @@ public final class GVRFloatAnimation implements PrettyPrint
         }
         mFloatsPerKey = keySize;
         mKeys = keyData;
-
-        mFloatInterpolator = new FloatKeyInterpolator(mKeys, keySize);
+        mFloatInterpolator = new LinearInterpolator(mKeys, keySize);
     }
 
     /**
@@ -308,8 +263,7 @@ public final class GVRFloatAnimation implements PrettyPrint
         }
         mFloatsPerKey = keySize;
         mKeys = new float[numKeys * keySize];
-
-        mFloatInterpolator = new FloatKeyInterpolator(mKeys, keySize);
+        mFloatInterpolator = new LinearInterpolator(mKeys, keySize);
     }
 
     /**
@@ -317,18 +271,10 @@ public final class GVRFloatAnimation implements PrettyPrint
      *
      * @return the number of keys
      */
-    public int getNumKeys() {
+    public int getNumKeys()
+    {
         return mKeys.length / mFloatsPerKey;
     }
-
-    public void setInterpolationType(String interplType)
-    {
-        interpolationType = interplType;
-
-
-
-    }
-
 
     public float getDuration()
     {
@@ -345,16 +291,15 @@ public final class GVRFloatAnimation implements PrettyPrint
      * @param keyIndex the index of the position key
      * @return the time component
      */
-    public float getTime(int keyIndex) {
+    public float getTime(int keyIndex)
+    {
         return mKeys[keyIndex * mFloatsPerKey];
     }
 
     /**
-     * Returns the scaling factor as vector.<p>
+     * Returns the key value in the given array.
      *
      * @param keyIndex the index of the scale key
-     *
-     * @return the scaling factor as vector
      */
     public void getKey(int keyIndex, float[] values)
     {
@@ -362,6 +307,12 @@ public final class GVRFloatAnimation implements PrettyPrint
         System.arraycopy(mKeys, index + 1, values, 0, values.length);
     }
 
+    /**
+     * Set the time and value of the key at the given index
+     * @param keyIndex  0 based index of key
+     * @param time      key time in seconds
+     * @param values    key values
+     */
     public void setKey(int keyIndex, float time, final float[] values)
     {
         int index = keyIndex * mFloatsPerKey;
@@ -376,8 +327,6 @@ public final class GVRFloatAnimation implements PrettyPrint
         System.arraycopy(values, 0, mKeys, index + 1, values.length);
     }
 
-
-
     /**
      * Obtains the transform for a specific time in animation.
      *
@@ -385,20 +334,32 @@ public final class GVRFloatAnimation implements PrettyPrint
      *
      * @return The transform.
      */
-
-
-
-
-
-
     public void animate(float animationTime, float[] destValues)
     {
-
-        mFloatInterpolator.interpolate(animationTime, destValues, interpolationType);
-
-
+        mFloatInterpolator.interpolate(animationTime, destValues);
     }
 
+    /**
+     * Resize the key data area.
+     * This function will truncate the keys if the
+     * initial setting was too large.
+     *
+     * @oaran numKeys the desired number of keys
+     */
+    public void resizeKeys(int numKeys)
+    {
+        int n = numKeys * mFloatsPerKey;
+        if (mKeys.length == n)
+        {
+            return;
+        }
+        float[] newKeys = new float[n];
+        n = Math.min(n, mKeys.length);
+
+        System.arraycopy(mKeys, 0, newKeys, 0, n);
+        mKeys = newKeys;
+        mFloatInterpolator.setKeyData(mKeys);
+    }
 
     @Override
     public void prettyPrint(StringBuffer sb, int indent) {
@@ -416,3 +377,4 @@ public final class GVRFloatAnimation implements PrettyPrint
     }
 
 }
+

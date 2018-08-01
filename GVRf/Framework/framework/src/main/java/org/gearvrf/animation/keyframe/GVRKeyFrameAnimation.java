@@ -17,7 +17,6 @@ public class GVRKeyFrameAnimation extends GVRAnimation implements PrettyPrint {
     protected String mName;
     protected float mTicksPerSecond;
     protected float mDurationTicks;
-
     protected List<GVRAnimationChannel> mChannels;
 
     protected GVRNodeAnimationController mNodeAnimationController;
@@ -35,7 +34,7 @@ public class GVRKeyFrameAnimation extends GVRAnimation implements PrettyPrint {
      * @param ticksPerSecond Number of ticks per second.
      */
     public GVRKeyFrameAnimation(String name, GVRSceneObject target, float durationTicks, float ticksPerSecond) {
-        super(target, durationTicks / ticksPerSecond);
+    	super(target, durationTicks / ticksPerSecond);
         mName = name;
         mDurationTicks = durationTicks;
         mTicksPerSecond = ticksPerSecond;
@@ -54,7 +53,6 @@ public class GVRKeyFrameAnimation extends GVRAnimation implements PrettyPrint {
     public void addChannel(GVRAnimationChannel channel) {
         mChannels.add(channel);
     }
-
 
     /**
      * Must be called after adding all channels.
@@ -122,8 +120,6 @@ public class GVRKeyFrameAnimation extends GVRAnimation implements PrettyPrint {
 
         mNodeAnimationController.animate(getDuration() * ratio);
 
-
-
         mSkinningController.animate(getDuration() * ratio);
     }
 
@@ -131,9 +127,7 @@ public class GVRKeyFrameAnimation extends GVRAnimation implements PrettyPrint {
         int i = 0;
         for (GVRAnimationChannel channel : mChannels) {
             channel.animate(animationTime, mTransforms[i++]);
-
         }
-
         return mTransforms;
     }
 }
