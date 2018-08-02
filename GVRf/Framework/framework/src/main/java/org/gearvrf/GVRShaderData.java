@@ -158,7 +158,6 @@ public class GVRShaderData extends GVRHybridObject
      * @return string with texture descriptor from shader
      */
     public String getTextureDescriptor() {
-        Log.i("desctexture","dzs"+mTextureDescriptor);
         return mTextureDescriptor; }
 
     /**
