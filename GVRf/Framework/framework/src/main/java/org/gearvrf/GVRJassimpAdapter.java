@@ -23,6 +23,8 @@ import org.gearvrf.animation.GVRAnimator;
 import org.gearvrf.animation.GVRPose;
 import org.gearvrf.animation.GVRSkeleton;
 import org.gearvrf.animation.GVRSkin;
+import org.gearvrf.animation.GVRMorphAnimation;
+import org.gearvrf.animation.GVRRepeatMode;
 import org.gearvrf.animation.keyframe.GVRAnimationBehavior;
 import org.gearvrf.animation.keyframe.GVRAnimationChannel;
 import org.gearvrf.animation.keyframe.GVRNodeAnimation;

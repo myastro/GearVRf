@@ -435,6 +435,36 @@ static bool copyBuffer(JNIEnv *env, jobject jMesh, const char* jBufferName, void
 	return true;
 }
 
+static bool copyBufferatOffset(JNIEnv *env, jobject jMesh, const char* jBufferName, void* cData,
+							   size_t size, const int offset)
+{
+	jobject jBuffer = NULL;
+	SmartLocalRef bufferRef(env, jBuffer);
+
+	if (!getField(env, jMesh, jBufferName, "Ljava/nio/ByteBuffer;", jBuffer))
+	{
+		return false;
+	}
+
+	if (env->GetDirectBufferCapacity(jBuffer) != size)
+	{
+		lprintf("invalid direct buffer, expected %u, got %llu\n", size, env->GetDirectBufferCapacity(jBuffer));
+		return false;
+	}
+
+	void* jBufferPtr = env->GetDirectBufferAddress(jBuffer);
+
+	if (NULL == jBufferPtr)
+	{
+		lprintf("could not access direct buffer\n");
+		return false;
+	}
+
+	memcpy(&jBufferPtr[offset], cData, size);
+
+	return true;
+}
+
 
 static bool copyBufferArray(JNIEnv *env, jobject jMesh, const char* jBufferName, int index, void* cData, size_t size)
 {
@@ -1734,6 +1764,71 @@ static bool loadAnimations(JNIEnv *env, const aiScene* cScene, jobject& jScene)
 				return false;
 			}
 		}
+
+		for (unsigned int c = 0; c < cAnimation->mNumMorphMeshChannels; c++)
+		{
+			const aiMeshMorphAnim *cMeshMorphAnim = cAnimation->mMorphMeshChannels[c];
+			int numMorphTargets = cMeshMorphAnim->mKeys[0].mNumValuesAndWeights;
+
+			jobject jMeshMorphAnim;
+			SmartLocalRef refNodeAnim(env, jMeshMorphAnim);
+
+			jvalue newMeshMorphAnimParams[3];
+			jstring animationName = env->NewStringUTF(cMeshMorphAnim->mName.C_Str());
+			SmartLocalRef refAnimationName(env, animationName);
+			newMeshMorphAnimParams[0].l = animationName;
+			newMeshMorphAnimParams[1].i = cMeshMorphAnim->mNumKeys;
+			newMeshMorphAnimParams[2].i = numMorphTargets;
+
+
+			if (!createInstance(env, "org/gearvrf/jassimp/AiMeshAnim", "(Ljava/lang/String;II)V", newMeshMorphAnimParams, jMeshMorphAnim))
+			{
+				return false;
+			}
+
+
+			/* add meshMorphAnim to m_animations java.util.List */
+			jobject jMeshMorphAnims = NULL;
+			SmartLocalRef refNodeAnims(env, jMeshMorphAnims);
+
+			if (!getField(env, jAnimation, "m_meshMorphAnims", "Ljava/util/List;", jMeshMorphAnims))
+			{
+				return false;
+			}
+
+			jvalue addParams[1];
+			addParams[0].l = jMeshMorphAnim;
+			if (!call(env, jMeshMorphAnims, "java/util/Collection", "add", "(Ljava/lang/Object;)Z", addParams))
+			{
+				return false;
+			}
+
+
+			for(int i = 0; i < numMorphTargets; i ++ )
+			{
+				/* copy keys */
+				if (!copyBufferatOffset(env, jMeshMorphAnim, "m_morphTargetWeights",  &cMeshMorphAnim->mKeys[i].mTime,
+										sizeof(double), sizeof(double) * i * (numMorphTargets + 1)))
+				{
+					return false;
+				}
+
+				/* copy keys */
+				if (!copyBufferatOffset(env, jMeshMorphAnim, "m_morphTargetWeights",
+										cMeshMorphAnim->mKeys[i].mWeights,
+										sizeof(double),
+										(sizeof(double) * i * (numMorphTargets + 1)) + 1))
+				{
+					return false;
+				}
+
+			}
+
+
+
+		}
+
+
 	}
 
 	lprintf("converting animations finished\n");
