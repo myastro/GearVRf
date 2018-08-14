@@ -4,21 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 
-import java.io.IOException;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import static java.lang.Math.max;
-
-import org.gearvrf.animation.GVRAnimation;
 import org.gearvrf.animation.GVRAnimator;
 import org.gearvrf.animation.GVRPose;
 import org.gearvrf.animation.GVRSkeleton;
@@ -54,7 +39,21 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import java.io.IOException;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import static java.lang.Integer.parseInt;
+import static java.lang.Math.max;
 
 class  GVRJassimpAdapter
 {

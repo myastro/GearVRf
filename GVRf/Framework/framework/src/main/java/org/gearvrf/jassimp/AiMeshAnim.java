@@ -41,9 +41,44 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.gearvrf.jassimp;
 
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 /**
  * This class is a stub - mesh animations are currently not supported.
  */
 public class AiMeshAnim {
+
+
+    AiMeshAnim(String nodeName, int numMeshMorphKeys, int numMorphTargets)
+    {
+        m_nodeName = nodeName;
+        m_numMeshMorphKeys = numMeshMorphKeys;
+        m_numMorphTargets = numMorphTargets;
+
+        m_morphTargetWeights = ByteBuffer.allocateDirect(numMeshMorphKeys * (numMorphTargets + 1));
+        m_morphTargetWeights.order(ByteOrder.nativeOrder());
+    }
+
+    /**
+     * Node name.
+     */
+    private final String m_nodeName;
+
+
+    /**
+     * Number of position keys.
+     */
+    private final int m_numMeshMorphKeys;
+
+    /**
+     * Number of morph targets.
+     */
+    private final int m_numMorphTargets;
+
+    /**
+     * Buffer with position keys.
+     */
+    private ByteBuffer m_morphTargetWeights;
 
 }
