@@ -1802,14 +1802,14 @@ static bool loadAnimations(JNIEnv *env, const aiScene* cScene, jobject& jScene)
 
 			for(int i = 0; i < numMorphTargets; i ++ )
 			{
-				/* copy keys */
+				/* copy time stamp */
 				if (!copyBufferatOffset(env, jMeshMorphAnim, "m_morphTargetWeights",  &cMeshMorphAnim->mKeys[i].mTime,
 										sizeof(double), sizeof(double) * i * (numMorphTargets + 1)))
 				{
 					return false;
 				}
 
-				/* copy keys */
+				/* copy blend weights */
 				if (!copyBufferatOffset(env, jMeshMorphAnim, "m_morphTargetWeights",
 										cMeshMorphAnim->mKeys[i].mWeights,
 										sizeof(double),
@@ -1819,8 +1819,6 @@ static bool loadAnimations(JNIEnv *env, const aiScene* cScene, jobject& jScene)
 				}
 
 			}
-
-
 
 		}
 

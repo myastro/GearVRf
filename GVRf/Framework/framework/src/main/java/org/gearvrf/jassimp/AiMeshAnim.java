@@ -43,10 +43,9 @@ package org.gearvrf.jassimp;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.DoubleBuffer;
 
-/**
- * This class is a stub - mesh animations are currently not supported.
- */
+
 public class AiMeshAnim {
 
 
@@ -58,6 +57,51 @@ public class AiMeshAnim {
 
         m_morphTargetWeights = ByteBuffer.allocateDirect(numMeshMorphKeys * (numMorphTargets + 1));
         m_morphTargetWeights.order(ByteOrder.nativeOrder());
+    }
+
+    /**
+     * @return  the morph animation keyframe data in the following timestamp blend weight format
+     *
+     *          t1, w, w, w, w, .....w, w, w
+                t2, w, w, w, w, .....w, w, w
+                t3, w, w, w, w, .....w, w, w
+                t4, w, 0, 0, w, .....w, w, w
+                .
+                .
+     *
+     */
+    public float[] getMorphAnimationKeys()
+    {
+        DoubleBuffer weights = m_morphTargetWeights.asDoubleBuffer();
+        double[] arr = new double[weights.remaining()];
+        weights.get(arr);
+
+
+        float[] farr = new float[arr.length];
+        for (int i = 0 ; i < arr.length; i++)
+        {
+            farr[i] = (float) arr[i];
+        }
+        return farr;
+    }
+
+
+    /**
+     * @return the number of morph targets in this mesh morph animation
+     */
+    public int getNumMorphTargets()
+    {
+        return m_numMorphTargets;
+    }
+
+
+    /**
+     *
+     * @return the name of the mesh of this animation
+     */
+    public String getNodeName()
+    {
+        return m_nodeName;
     }
 
     /**

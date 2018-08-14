@@ -23,6 +23,7 @@ import org.gearvrf.jassimp.AiLight;
 import org.gearvrf.jassimp.AiLightType;
 import org.gearvrf.jassimp.AiMaterial;
 import org.gearvrf.jassimp.AiMesh;
+import org.gearvrf.jassimp.AiMeshAnim;
 import org.gearvrf.jassimp.AiNode;
 import org.gearvrf.jassimp.AiNodeAnim;
 import org.gearvrf.jassimp.AiPostProcessSteps;
@@ -871,7 +872,6 @@ class  GVRJassimpAdapter
         {
             GVRSceneObject obj = entry.getKey();
             int meshId = entry.getValue();
-
             if (meshId >= 0)
             {
                 processMesh(request, obj, meshId);
