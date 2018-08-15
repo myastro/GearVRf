@@ -446,13 +446,7 @@ static bool copyBufferatOffset(JNIEnv *env, jobject jMesh, const char* jBufferNa
 		return false;
 	}
 
-	if (env->GetDirectBufferCapacity(jBuffer) != size)
-	{
-		lprintf("invalid direct buffer, expected %u, got %llu\n", size, env->GetDirectBufferCapacity(jBuffer));
-		return false;
-	}
-
-	void* jBufferPtr = env->GetDirectBufferAddress(jBuffer);
+	unsigned char* jBufferPtr = (unsigned char*)env->GetDirectBufferAddress(jBuffer);
 
 	if (NULL == jBufferPtr)
 	{
@@ -1804,7 +1798,7 @@ static bool loadAnimations(JNIEnv *env, const aiScene* cScene, jobject& jScene)
 			}
 
 
-			for(int i = 0; i < numMorphTargets; i ++ )
+			for(int i = 0; i < cMeshMorphAnim->mNumKeys; i ++ )
 			{
 				/* copy time stamp */
 				if (!copyBufferatOffset(env, jMeshMorphAnim, "m_morphTargetWeights",  &cMeshMorphAnim->mKeys[i].mTime,
@@ -1816,8 +1810,8 @@ static bool loadAnimations(JNIEnv *env, const aiScene* cScene, jobject& jScene)
 				/* copy blend weights */
 				if (!copyBufferatOffset(env, jMeshMorphAnim, "m_morphTargetWeights",
 										cMeshMorphAnim->mKeys[i].mWeights,
-										sizeof(double),
-										(sizeof(double) * i * (numMorphTargets + 1)) + 1))
+										sizeof(double) * numMorphTargets,
+										(sizeof(double) * i * (numMorphTargets + 1)) + sizeof(double)))
 				{
 					return false;
 				}
