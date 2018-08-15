@@ -49,13 +49,16 @@ import java.nio.DoubleBuffer;
 public class AiMeshAnim {
 
 
+    private final int SIZEOF_DOUBLE = Jassimp.NATIVE_DOUBLE_SIZE;
+
+
     AiMeshAnim(String nodeName, int numMeshMorphKeys, int numMorphTargets)
     {
         m_nodeName = nodeName;
         m_numMeshMorphKeys = numMeshMorphKeys;
         m_numMorphTargets = numMorphTargets;
 
-        m_morphTargetWeights = ByteBuffer.allocateDirect(numMeshMorphKeys * (numMorphTargets + 1));
+        m_morphTargetWeights = ByteBuffer.allocateDirect(numMeshMorphKeys * (numMorphTargets + 1) * SIZEOF_DOUBLE);
         m_morphTargetWeights.order(ByteOrder.nativeOrder());
     }
 
@@ -65,7 +68,7 @@ public class AiMeshAnim {
      *          t1, w, w, w, w, .....w, w, w
                 t2, w, w, w, w, .....w, w, w
                 t3, w, w, w, w, .....w, w, w
-                t4, w, 0, 0, w, .....w, w, w
+                t4, w, w, w, w, .....w, w, w
                 .
                 .
      *
@@ -73,6 +76,7 @@ public class AiMeshAnim {
     public float[] getMorphAnimationKeys()
     {
         DoubleBuffer weights = m_morphTargetWeights.asDoubleBuffer();
+        int temp = weights.remaining();
         double[] arr = new double[weights.remaining()];
         weights.get(arr);
 
