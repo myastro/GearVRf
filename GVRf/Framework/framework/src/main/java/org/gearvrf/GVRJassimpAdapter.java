@@ -541,7 +541,6 @@ class  GVRJassimpAdapter
         {
             String nodeName = aiNodeAnim.getNodeName();
             GVRAnimationChannel channel = animMap.get(nodeName);
-
             if (channel == null)
             {
                 continue;
