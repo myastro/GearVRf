@@ -145,7 +145,7 @@ Surface @ShaderName()
 #endif
 #if defined(HAS_normalTexture)
     viewspaceNormal = texture(normalTexture, normal_coord.xy).xyz * 2.0 - 1.0;
-        viewspaceNormal = normalize(calculateTangentMatrix() * viewspaceNormal * vec3(normalScale, normalScale, 1.0));
+    viewspaceNormal = normalize(calculateTangentMatrix() * viewspaceNormal * vec3(normalScale, normalScale, 1.0));
 #else
     viewspaceNormal = viewspace_normal;
 #endif
