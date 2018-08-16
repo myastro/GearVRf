@@ -546,6 +546,24 @@ class  GVRJassimpAdapter
                 Log.d("BONE", "Adding node animation for %s", nodeName);
             }
         }
+
+
+        //add morph animations
+        if(aiAnim.getNumMeshChannels() > 0 ) {
+
+            for (AiMeshAnim aiMeshMorphAnim : aiAnim.getMeshChannels()) {
+
+                GVRSceneObject baseObject = target.getSceneObjectByName(aiMeshMorphAnim.getNodeName());
+                GVRMeshMorph morph = (GVRMeshMorph)baseObject.getComponent(GVRMeshMorph.getComponentType());
+                GVRMorphAnimation morphAnim = new GVRMorphAnimation(morph,
+                        aiMeshMorphAnim.getMorphAnimationKeys(), aiMeshMorphAnim.getNumMorphTargets() + 1);
+
+                if (morphAnim != null) {
+                    animator.addAnimation(morphAnim);
+                }
+            }
+        }
+        
     }
 
     /*
@@ -873,11 +891,7 @@ class  GVRJassimpAdapter
         mMaterials = new GVRMaterial[scene.getNumMaterials()];
 
         traverseGraph(model, scene.getSceneRoot(sWrapperProvider), lightList);
-        if (!doAnimation ||
-            ((processAnimations(model, scene, settings.contains(GVRImportSettings.START_ANIMATIONS)) == null)))
-        {
-            makeSkeleton(model);
-        }
+
         for (Map.Entry<GVRSceneObject, Integer> entry : mNodeMap.entrySet())
         {
             GVRSceneObject obj = entry.getKey();
@@ -887,6 +901,13 @@ class  GVRJassimpAdapter
                 processMesh(request, obj, meshId);
             }
         }
+
+        if (!doAnimation ||
+            ((processAnimations(model, scene, settings.contains(GVRImportSettings.START_ANIMATIONS)) == null)))
+        {
+            makeSkeleton(model);
+        }
+
     }
 
     private GVRAnimator processAnimations(GVRSceneObject model, AiScene scene, boolean startAnimations)
