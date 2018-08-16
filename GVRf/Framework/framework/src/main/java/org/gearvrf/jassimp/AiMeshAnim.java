@@ -76,7 +76,6 @@ public class AiMeshAnim {
     public float[] getMorphAnimationKeys()
     {
         DoubleBuffer weights = m_morphTargetWeights.asDoubleBuffer();
-        int temp = weights.remaining();
         double[] arr = new double[weights.remaining()];
         weights.get(arr);
 
