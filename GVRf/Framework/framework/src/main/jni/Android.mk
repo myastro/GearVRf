@@ -21,6 +21,11 @@ LOCAL_SRC_FILES := ../prebuilt/$(TARGET_ARCH_ABI)/libassimp.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
+LOCAL_MODULE    := neuron
+LOCAL_SRC_FILES := ../prebuilt/$(TARGET_ARCH_ABI)/libArticulatedPhysicsAndNeuron32.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
 LOCAL_MODULE := gvrf
 
 FILE_LIST := $(wildcard $(LOCAL_PATH)/*.cpp)
@@ -29,6 +34,8 @@ LOCAL_SRC_FILES += $(FILE_LIST:$(LOCAL_PATH)/%=%)
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/contrib/assimp
 LOCAL_C_INCLUDES +=	$(LOCAL_PATH)/contrib/assimp/include
 LOCAL_C_INCLUDES +=	$(LOCAL_PATH)/contrib/assimp/include/Compiler
+
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/contrib/neuron
 
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/contrib/jassimp
 # Uncomment for logs
@@ -82,6 +89,7 @@ FILE_LIST := $(wildcard $(LOCAL_PATH)/vulkan/*.cpp)
 LOCAL_SRC_FILES += $(FILE_LIST:$(LOCAL_PATH)/%=%)
 
 LOCAL_SHARED_LIBRARIES += assimp
+LOCAL_SHARED_LIBRARIES += neuron
 LOCAL_STATIC_LIBRARIES += shaderc
 
 ifeq ($(TARGET_ARCH_ABI),$(filter $(TARGET_ARCH_ABI), armeabi-v7a x86))
