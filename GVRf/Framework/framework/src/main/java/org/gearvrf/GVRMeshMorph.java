@@ -24,19 +24,41 @@ import java.util.regex.Pattern;
 import static android.opengl.GLES20.GL_RGB;
 import static android.opengl.GLES30.GL_RGB32F;
 
-
-
 /**
- * Attaches a morph to a scene object with a base mesh and sets the blend shapes.
+ * Component which morphs a mesh based on a set of blend shapes.
  * <p>
- * When a morph is constructed, number of blend shapes is passed to set for base shape.
- * The differences are determined between base shape and blend shapes vertex descriptors and are assigned to texture.
- * Usually base shape vertex descriptor contains positions. They might also have normals, tangents, bitangents, bone weights and indices.
- * The blend shapes descriptor contain positions. They might also contain normals, tangents, bitangents.
- *</p>
- *@see GVRVertexBuffer
+ * The mesh being morphed is not changed - it's vertices
+ * always contain the base shape being morphed.
+ * Each blend shape is represented as a {@link GVRVertexBuffer}
+ * with vertices in the same order as the base shape
+ * but in different positions. A blend shape vertex
+ * buffer may contain normals, tangents and bitangents
+ * as well. The only restriction is that, if the attribute
+ * is present in the base shape, the blend shapes must
+ * also have it (applies only to a_position, a_normal,
+ * a_tangent and a_bitangent vertex attributes).
+ * <p>
+ * The {@link GVRMeshMorph} component should be attached
+ * to the {@link GVRSceneObject} which owns the base mesh.
+ * The {@link GVRMaterial} used to render the mesh must
+ * have a shader that supports morphing.
+ * </p>
+ * In addition to blend shapes, the morph component
+ * has a set of blend weights which indicate what
+ * proportion of each blend shape is used to
+ * morph the mesh. After all the blend shapes
+ * have been added and the weights are set,
+ * the blend shape information is converted into
+ * a {@link GVRFloatImage} where each RGB ixel is
+ * actually three 32 bit floats representing a 3D
+ * vector or position. Each row of the texture represents
+ * a vertex, each column all the blend shape information
+ * for just that vertex.
+ * <p>
+ * The blend shape texture is put in the <b>blendShapeTexture</b> sampler
+ * in the vertex shader. The blend weights are in the <b>u_blendweights</b> uniform.
+ * </p>
  */
-
 public class GVRMeshMorph extends GVRBehavior
 {
     static private long TYPE_MESHMORPH = newComponentType(GVRMeshMorph.class);
@@ -62,8 +84,6 @@ public class GVRMeshMorph extends GVRBehavior
      * @param ctx  The current GVRF context.
      * @param numBlendShapes number of blend shapes to be set.
      */
-
-
     public GVRMeshMorph(GVRContext ctx, int numBlendShapes)
     {
         super(ctx, 0);
@@ -79,11 +99,7 @@ public class GVRMeshMorph extends GVRBehavior
 
     }
 
-
     static public long getComponentType() { return TYPE_MESHMORPH; }
-
-
-
 
     /**
      * Attaches a morph to scene object with a base mesh
@@ -92,8 +108,6 @@ public class GVRMeshMorph extends GVRBehavior
      * @throws IllegalStateException if mesh is null
      * @throws IllegalStateException if material is null
      */
-
-
     public void onAttach(GVRSceneObject sceneObj)
     {
 
@@ -135,10 +149,7 @@ public class GVRMeshMorph extends GVRBehavior
     {
         String baseDescriptor = baseShape.getDescriptor();
 
-
-
         mFloatsPerVertex = 3;
-
         if (baseDescriptor.contains("a_normal"))
         {
             mDescriptorFlags |= HAS_NORMAL;
@@ -146,15 +157,11 @@ public class GVRMeshMorph extends GVRBehavior
         }
         if (baseDescriptor.contains("a_tangent"))
         {
-
-
             mDescriptorFlags |= HAS_TANGENT;
             mFloatsPerVertex += 6;
         }
         mbaseShape = baseShape;
-
         mNumVerts = baseShape.getVertexCount();
-
         if (mNumVerts <= 0)
         {
             throw new IllegalArgumentException("Base shape has no vertices");
@@ -163,8 +170,6 @@ public class GVRMeshMorph extends GVRBehavior
         mBaseBlendShape = new float[mFloatsPerVertex * mNumVerts];
         mWeights = new float[mNumBlendShapes];
         mBlendShapeDiffs = new float[mTexWidth * mNumVerts];
-
-
         copyBaseAttribute(baseShape, "a_position", 0);
         if ((mDescriptorFlags & HAS_NORMAL) != 0)
         {
@@ -180,7 +185,6 @@ public class GVRMeshMorph extends GVRBehavior
 
     protected void copyBaseAttribute(GVRVertexBuffer baseShape, String attrName, int baseOfs)
     {
-
         float[] vec3data = baseShape.getFloatArray(attrName);
         for (int i = 0; i < mNumVerts; ++i)
         {
@@ -201,9 +205,6 @@ public class GVRMeshMorph extends GVRBehavior
         {
             throw new IllegalArgumentException("All blend shapes must have the same number of vertices");
         }
-
-
-
         for (int i = 0; i < mNumVerts; ++i)
         {
             int b = i * mFloatsPerVertex + baseofs;
@@ -256,10 +257,7 @@ public class GVRMeshMorph extends GVRBehavior
         int shapeDescriptorFlags = 0;
         String shapeDescriptor = vbuf.getDescriptor();
 
-
-
         copyBlendShape(index * mFloatsPerVertex, 0, vbuf.getFloatArray("a_position"));
-
         if (shapeDescriptor.contains("a_normal"))
         {
             shapeDescriptorFlags |= HAS_NORMAL;
@@ -282,7 +280,6 @@ public class GVRMeshMorph extends GVRBehavior
             copyBlendShape(index * mFloatsPerVertex + 9, 9, vbuf.getFloatArray("a_bitangent"));
         }
     }
-
 
     private GVRMaterial getMaterial()
     {
