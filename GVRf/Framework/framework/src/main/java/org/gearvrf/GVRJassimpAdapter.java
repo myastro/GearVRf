@@ -21,7 +21,9 @@ import static java.lang.Math.max;
 
 import org.gearvrf.animation.GVRAnimation;
 import org.gearvrf.animation.GVRAnimator;
+import org.gearvrf.animation.GVRMorphAnimation;
 import org.gearvrf.animation.GVRPose;
+import org.gearvrf.animation.GVRRepeatMode;
 import org.gearvrf.animation.GVRSkeleton;
 import org.gearvrf.animation.GVRSkin;
 import org.gearvrf.animation.keyframe.GVRAnimationBehavior;
@@ -553,6 +555,22 @@ class  GVRJassimpAdapter
                 Log.d("BONE", "Adding node animation for %s", nodeName);
             }
         }
+
+        //add morph animations
+        if(aiAnim.getNumMeshChannels() > 0 ) {
+
+            for (AiMeshAnim aiMeshMorphAnim : aiAnim.getMeshChannels()) {
+
+                GVRSceneObject baseObject = target.getSceneObjectByName(aiMeshMorphAnim.getNodeName());
+                GVRMeshMorph morph = (GVRMeshMorph)baseObject.getComponent(GVRMeshMorph.getComponentType());
+                GVRMorphAnimation morphAnim = new GVRMorphAnimation(morph,
+                        aiMeshMorphAnim.getMorphAnimationKeys(), aiMeshMorphAnim.getNumMorphTargets() + 1);
+
+                if (morphAnim != null) {
+                    animator.addAnimation(morphAnim);
+                }
+            }
+        }
     }
 
     /*
@@ -702,14 +720,14 @@ class  GVRJassimpAdapter
             for (i = 1; i < aiNodeAnim.getNumPosKeys(); ++i)
             {
                 float[] pos = aiNodeAnim.getPosKeyVector(i, sWrapperProvider);
-                if (!isEqual(pos, curpos))
+//                if (!isEqual(pos, curpos))
                 {
                     t = (float) aiNodeAnim.getPosKeyTime(i) / ticksPerSec;
                     channel.setPosKeyVector(nextIndex++, t, pos);
                     curpos = pos;
                 }
             }
-            channel.resizePosKeys(nextIndex);
+//            channel.resizePosKeys(nextIndex);
         }
 
         if (aiNodeAnim.getNumRotKeys() > 0)
@@ -722,14 +740,14 @@ class  GVRJassimpAdapter
             for (i = 1; i < aiNodeAnim.getNumRotKeys(); ++i)
             {
                 Quaternionf rot = aiNodeAnim.getRotKeyQuaternion(i, sWrapperProvider);
-                if (!isEqual(rot, currot))
+//                if (!isEqual(rot, currot))
                 {
                     t = (float) aiNodeAnim.getRotKeyTime(i) / ticksPerSec;
                     channel.setRotKeyQuaternion(nextIndex++, t, rot);
                     currot = rot;
                 }
             }
-            channel.resizeRotKeys(nextIndex);
+//            channel.resizeRotKeys(nextIndex);
         }
 
         if (aiNodeAnim.getNumScaleKeys() > 0)
@@ -743,13 +761,13 @@ class  GVRJassimpAdapter
             {
                 float[] scale = aiNodeAnim.getScaleKeyVector(i, sWrapperProvider);
 
-                if (!isEqual(scale, curscale))
+//                if (!isEqual(scale, curscale))
                 {
                     t = (float) aiNodeAnim.getScaleKeyTime(i) / ticksPerSec;
                     channel.setScaleKeyVector(nextIndex++, t, scale);
                 }
             }
-            channel.resizeScaleKeys(nextIndex);
+//            channel.resizeScaleKeys(nextIndex);
         }
         return channel;
     }
@@ -879,10 +897,7 @@ class  GVRJassimpAdapter
 
         traverseGraph(model, scene.getSceneRoot(sWrapperProvider), lightList);
         makeSkeleton(model);
-        if (doAnimation)
-        {
-            processAnimations(model, scene, settings.contains(GVRImportSettings.START_ANIMATIONS));
-        }
+
         for (Map.Entry<GVRSceneObject, Integer> entry : mNodeMap.entrySet())
         {
             GVRSceneObject obj = entry.getKey();
@@ -892,6 +907,12 @@ class  GVRJassimpAdapter
                 processMesh(request, obj, meshId);
             }
         }
+
+        if (doAnimation)
+        {
+            processAnimations(model, scene, settings.contains(GVRImportSettings.START_ANIMATIONS));
+        }
+
         if (modelParent != null)
         {
             modelParent.addChildObject(model);
@@ -909,6 +930,10 @@ class  GVRJassimpAdapter
             {
                 createAnimation(aiAnim, model, animator);
             }
+
+            animator.setRepeatCount(1000);
+            animator.setRepeatMode(GVRRepeatMode.REPEATED);
+
             return animator;
         }
         return null;
