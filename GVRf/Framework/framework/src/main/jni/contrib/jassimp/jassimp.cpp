@@ -961,10 +961,76 @@ static bool loadMeshes(JNIEnv *env, const aiScene* cScene, jobject& jScene)
 			}
 		}
 
-
+		static int temp = 0;
 		for (unsigned int b = 0; b < cMesh->mNumBones; b++)
 		{
 			aiBone *cBone = cMesh->mBones[b];
+////
+////			float weights[20] ;
+////			int vertices[20];
+////
+////			for(int i = 0; i < cBone->mNumWeights; ++ i)
+////			{
+////				weights[i] = cBone->mWeights[i].mWeight;
+////				vertices[i] = cBone->mWeights[i].mVertexId;
+////			}
+//
+//			aiBone *cBone  = new aiBone();
+//			if(temp == 0)
+//			{
+//				cBone->mNumWeights = 10;
+//				cBone->mName = "nodes_1";
+//				cBone->mOffsetMatrix = aiMatrix4x4t<float>(1,0,0,0,0,1,0,0,0,0,1,0,-0.5,-1,0,1);
+//
+//				aiVertexWeight * weights = new aiVertexWeight[10];
+//				float temp2 = 1.25;
+//				for(int itr1 = 0; itr1 < 10; itr1 ++)
+//				{
+//					weights[itr1].mVertexId = itr1;
+//
+//
+//					if(itr1 % 2 == 0)
+//						temp2 -= 0.25f;
+//
+//
+//					weights[itr1].mWeight = temp2;
+//
+//				}
+//                cBone->mWeights = weights;
+//				temp++;
+//			}
+//			else
+//			{
+//				cBone->mNumWeights = 10;
+//				cBone->mName = "nodes_2";
+//				cBone->mOffsetMatrix = aiMatrix4x4t<float>(1,0,0,0,0,1,0,0,0,0,1,0,-0.5,-1,0,1);
+//
+//				aiVertexWeight * weights = new aiVertexWeight[10];
+//				float temp2 = -0.25;
+//				for(int itr1 = 0; itr1 < 10; itr1 ++)
+//				{
+//					weights[itr1].mVertexId = itr1;
+//
+//
+//					if(itr1 % 2 == 0)
+//						temp2 += 0.25f;
+//
+//
+//					weights[itr1].mWeight = temp2;
+//
+//				}
+//                cBone->mWeights = weights;
+//			}
+//
+//
+//			float weights[20] ;
+//			int vertices[20];
+//
+//			for(int i = 0; i < cBone->mNumWeights; ++ i)
+//			{
+//				weights[i] = cBone->mWeights[i].mWeight;
+//				vertices[i] = cBone->mWeights[i].mVertexId;
+//			}
 
 			jobject jBone;
 			SmartLocalRef refBone(env, jBone);
@@ -1741,6 +1807,10 @@ static bool loadAnimations(JNIEnv *env, const aiScene* cScene, jobject& jScene)
 			{
 				return false;
 			}
+
+//            aiQuatKey keys[12];
+//            for(int i = 0; i < 12; i ++)
+//                keys[i] = cNodeAnim->mRotationKeys[i];
 
 			if (!copyBuffer(env, jNodeAnim, "m_rotKeys", cNodeAnim->mRotationKeys, 
 				cNodeAnim->mNumRotationKeys * sizeof(aiQuatKey)))
