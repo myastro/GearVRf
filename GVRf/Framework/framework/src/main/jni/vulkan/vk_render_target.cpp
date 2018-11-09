@@ -32,9 +32,10 @@ VkRenderTarget::VkRenderTarget(RenderTexture* renderTexture, bool is_multiview):
 
 VkRenderTarget::VkRenderTarget(Scene* scene): RenderTarget(scene){
 }
+VkRenderTarget::VkRenderTarget(Scene* scene, int defaultViewportW, int defaultViewportH): RenderTarget(scene, defaultViewportW, defaultViewportH){
+}
 VkRenderTarget::VkRenderTarget(RenderTexture* renderTexture, const RenderTarget* source): RenderTarget(renderTexture, source){
 }
-
 
 VkRenderTexture* VkRenderTarget :: getTexture() {
     VkFence fence =  static_cast<VkRenderTexture*>(mRenderTexture)->getFenceObject();
